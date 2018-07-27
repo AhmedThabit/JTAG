@@ -14,8 +14,16 @@ old_graph_msg = 'Resolving old graph def {} (no guarantee)'
 def build_train_op(self):
     self.framework.loss(self.out)
     self.say('Building {} train op'.format(self.meta['model']))
-    optimizer = self._TRAINER[self.FLAGS.trainer](self.FLAGS.lr)
-    gradients = optimizer.compute_gradients(self.framework.loss)
+
+    ############ MODIFY CODE HERE ##############
+
+    #Step 1: Define a new placeholder for the learning rate
+    
+    #Step 2: Pass the new placeholder as an argument to the optimizer
+
+
+    ############ END MODIFICATION HERE ##############
+    
     self.train_op = optimizer.apply_gradients(gradients)
 
 def load_from_ckpt(self):

@@ -1,8 +1,9 @@
 import os
 import time
 import numpy as np
-# import tensorflow as tf
+import tensorflow as tf
 import pickle
+from subprocess import call
 from multiprocessing.pool import ThreadPool
 
 train_stats = (
@@ -12,15 +13,18 @@ train_stats = (
     '\tEpoch number  : {}\n'
     '\tBackup every  : {}'
 )
-pool = ThreadPool()
 
 def _save_ckpt(self, step, loss_profile):
+    """
+    Creates checkpoints to store the step number and loss information.
+    """
+
     file = '{}-{}{}'
     model = self.meta['name']
 
     profile = file.format(model, step, '.profile')
     profile = os.path.join(self.FLAGS.backup, profile)
-    with open(profile, 'wb') as profile_ckpt:
+    with open(profile, 'wb') as profile_ckpt: 
         pickle.dump(loss_profile, profile_ckpt)
 
     ckpt = file.format(model, step, '')
@@ -28,31 +32,64 @@ def _save_ckpt(self, step, loss_profile):
     self.say('Checkpoint at step {}'.format(step))
     self.saver.save(self.sess, ckpt)
 
+    print("Finished saving checkpoint")
 
 def train(self):
+    """
+    Executes the computational graph to progress in the optimization process. 
+
+    Calls the following functions:
+       - .shuffle()
+       - _save_ckpt()
+    """
+
+    ######### MODIFY CODE HERE (Learning Rate Problem) ##########
+
+    #Step1: Parse "steps" and store its values in a 1-D array
+
+    #Step2: Parse "scales" (reduction factors) and store its values in a 1-D array
+
+    #Step3: Store the argument of the flag --lr in a variable
+
+    ######### END MODIFICATION HERE (Learning Rate Problem) ##########
+
     loss_ph = self.framework.placeholders
     loss_mva = None; profile = list()
+    loss_mva_valid = None
 
+    #Creates train batches
     batches = self.framework.shuffle()
+
     loss_op = self.framework.loss
 
     for i, (x_batch, datum) in enumerate(batches):
+
+        # Print only at first iteration step the following flags
         if not i: self.say(train_stats.format(
             self.FLAGS.lr, self.FLAGS.batch,
             self.FLAGS.epoch, self.FLAGS.save
         ))
 
         feed_dict = {
-            loss_ph[key]: datum[key]
+            loss_ph[key]: datum[key] 
                 for key in loss_ph }
         feed_dict[self.inp] = x_batch
         feed_dict.update(self.feed)
 
-        fetches = [self.train_op, loss_op]
+        ######### MODIFY CODE HERE (Learning Rate Problem) ##########
 
-        if self.FLAGS.summary:
-            fetches.append(self.summary_op)
+        #Step 1: Store the "lr" variable in the feed_dict
 
+
+        #Step 2: Learning rate update condition 
+   
+
+        #Step 3: Rescale learning rate and print resulting learning rate
+
+         ######### END MODIFICATION HERE (Learning Rate Problem) ##########
+
+
+        fetches = [self.train_op, loss_op, self.summary_op] 
         fetched = self.sess.run(fetches, feed_dict)
         loss = fetched[1]
 
@@ -60,16 +97,45 @@ def train(self):
         loss_mva = .9 * loss_mva + .1 * loss
         step_now = self.FLAGS.load + i + 1
 
-        if self.FLAGS.summary:
-            self.writer.add_summary(fetched[2], step_now)
+        self.writer.add_summary(fetched[2], step_now)
 
-        form = 'step {} - loss {} - moving ave loss {}'
+        form = 'TRAINING step {} - loss {} - moving ave loss {}'
         self.say(form.format(step_now, loss, loss_mva))
         profile += [(loss, loss_mva)]
 
+        #Saves Training set Checkpoint 
         ckpt = (i+1) % (self.FLAGS.save // self.FLAGS.batch)
         args = [step_now, profile]
         if not ckpt: _save_ckpt(self, *args)
+
+        ######### MODIFY CODE HERE (Validation Metric Problem) ##########
+
+        # Get validation set data
+
+        (x_batch, datum) = next(val_batches)
+        feed_dict = {
+            loss_ph[key]: datum[key] 
+                for key in loss_ph }
+        feed_dict[self.inp] = x_batch
+        feed_dict.update(self.feed)
+        
+        feed_dict[self.learning_rate] = lr
+
+        fetches = [loss_op, self.summary_op] 
+        fetched = self.sess.run(fetches, feed_dict)
+        loss = fetched[0]
+
+        if loss_mva_valid is None: loss_mva_valid = loss
+        loss_mva_valid = .9 * loss_mva_valid + .1 * loss
+
+        self.val_writer.add_summary(fetched[1], step_now)
+
+        #Print results
+        form = 'VALIDATION step {} - loss {} - moving ave loss {}'
+        self.say(form.format(step_now, loss, loss_mva_valid))
+
+        ######### END MODIFICATION HERE (Validation Metric Problem) ##########
+
 
     if ckpt: _save_ckpt(self, *args)
 
@@ -120,13 +186,18 @@ def predict(self):
         to_idx = min(from_idx + batch, len(all_inps))
 
         # collect images input in the batch
+        inp_feed = list(); new_all = list()
         this_batch = all_inps[from_idx:to_idx]
-        inp_feed = pool.map(lambda inp: (
-            np.expand_dims(self.framework.preprocess(
-                os.path.join(inp_path, inp)), 0)), this_batch)
+        for inp in this_batch:
+            new_all += [inp]
+            this_inp = os.path.join(inp_path, inp)
+            this_inp = self.framework.preprocess(this_inp)
+            expanded = np.expand_dims(this_inp, 0)
+            inp_feed.append(expanded)
+        this_batch = new_all
 
         # Feed to the net
-        feed_dict = {self.inp : np.concatenate(inp_feed, 0)}
+        feed_dict = {self.inp : np.concatenate(inp_feed, 0)}    
         self.say('Forwarding {} inputs ...'.format(len(inp_feed)))
         start = time.time()
         out = self.sess.run(self.out, feed_dict)
@@ -137,6 +208,7 @@ def predict(self):
         # Post processing
         self.say('Post processing {} inputs ...'.format(len(inp_feed)))
         start = time.time()
+        pool = ThreadPool()
         pool.map(lambda p: (lambda i, prediction:
             self.framework.postprocess(
                prediction, os.path.join(inp_path, this_batch[i])))(*p),

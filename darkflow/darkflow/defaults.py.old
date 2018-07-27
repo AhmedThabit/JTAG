@@ -35,16 +35,6 @@ class argHandler(dict):
         self.define('saveVideo', False, 'Records video from input video or camera')
         self.define('pbLoad', '', 'path to .pb protobuf file (metaLoad must also be specified)')
         self.define('metaLoad', '', 'path to .meta file generated during --savepb that corresponds to .pb file')
-        
-        # Add new argument handlers/flags to the flow command
-        
-        ########## START CODE HERE ###########
-
-        #Step 1: Define a flag that stores a list of steps for the learning rate decay
-
-        #Step 2: Define a flag that stores a list of reduction factors for the learning rate decay
-        
-        ########## END CODE HERE ###########
 
     def define(self, argName, default, description):
         self[argName] = default
