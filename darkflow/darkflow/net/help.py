@@ -20,9 +20,9 @@ def build_train_op(self):
     #Step 1: Define a new placeholder for the learning rate
     self.learning_rate= tf.placeholder(tf.float32)
     #Step 2: Pass the new placeholder as an argument to the optimizer
-    optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate)
+    # optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate)
     # self.framework.loss = optimizer.compute_gradients(cnn.loss)
-    # optimizer = self._TRAINER[self.FLAGS.trainer](ourlr)
+    optimizer = self._TRAINER[self.FLAGS.trainer](self.learning_rate)
     gradients = optimizer.compute_gradients(self.framework.loss)
 
 
