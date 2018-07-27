@@ -1,0 +1,50 @@
+<annotation>
+	<folder>label copy</folder>
+	<filename>IMG_6750.JPG</filename>
+	<path>/Users/ziyi/Pictures/roll/label copy/IMG_6750.JPG</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>500</width>
+		<height>500</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>roll</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>84</xmin>
+			<ymin>168</ymin>
+			<xmax>204</xmax>
+			<ymax>314</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>roll</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>187</xmin>
+			<ymin>194</ymin>
+			<xmax>320</xmax>
+			<ymax>343</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>roll</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>205</xmin>
+			<ymin>254</ymin>
+			<xmax>349</xmax>
+			<ymax>448</ymax>
+		</bndbox>
+	</object>
+</annotation>
