@@ -17,3 +17,5 @@ floyd run --gpu --env pytorch <insert-command-here>
 
 # example:
 floyd run --gpu --env tensorflow-1.3 "python train_and_eval.py"
+
+floyd logs -t
