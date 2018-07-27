@@ -25,14 +25,22 @@ floyd run --data <data_set_name>:<mount_point> …(rest of run command)
 # create a folder deeplearning.ai/dataset_rolls
 # create a folder deeplearning.ai/weights
 floyd run \
-  --data ~/CloudStation/CS-scratchpad/data/deeplearning.ai:/dat \
-  "flow --backup /dat/ckpt/ \
+  --data datasets/jtag_weights/1:/weights \
+  --data datasets/jtag_weights/2:/dat \
+  "pip install -e . &&
+   flow --backup /dat/ckpt/ \
        --model cfg/tiny-yolo-voc-roll-jc.cfg \
-       --load /dat/weights/tiny-yolo-voc.weights \
+       --load /weights/tiny-yolo-voc.weights \
        --train \
          --annotation /dat/dataset_rolls/tiny_train/annotations/ \
          --dataset /dat/dataset_rolls/tiny_train/images/ \
        --lr 0.0001 --epoch 200 --save 100 --batch 1"
+
+floyd data init DATASET_NAME
+floyd data init jtag_weights
+cd FOLDER_OF_WEIGHTS
+floyd data upload
+
 
 
 
