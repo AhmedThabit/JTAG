@@ -1,0 +1,19 @@
+pip install -U floyd-cli
+
+floyd login
+
+git clone https://github.com/floydhub/quick-start.git
+
+cd quick-start
+
+# floyd init mnist-cnn
+floyd init landinging/[PROJECT NAME]
+
+floyd run <insert-command-here>
+# To use GPU
+floyd run --gpu <insert-command-here>
+# To use a different environment
+floyd run --gpu --env pytorch <insert-command-here>
+
+# example:
+floyd run --gpu --env tensorflow-1.3 "python train_and_eval.py"
