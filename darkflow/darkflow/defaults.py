@@ -4,7 +4,7 @@ class argHandler(dict):
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
     _descriptions = {'help, --h, -h': 'show this super helpful message and exit'}
-    
+
     def setDefaults(self):
         self.define('imgdir', './sample_img/', 'path to testing directory with images')
         self.define('binary', './bin/', 'path to .weights directory')
@@ -35,24 +35,22 @@ class argHandler(dict):
         self.define('saveVideo', False, 'Records video from input video or camera')
         self.define('pbLoad', '', 'path to .pb protobuf file (metaLoad must also be specified)')
         self.define('metaLoad', '', 'path to .meta file generated during --savepb that corresponds to .pb file')
-        
+
         # Add new argument handlers/flags to the flow command
-        
+
         ########## START CODE HERE ###########
 
         #Step 1: Define a flag that stores a list of steps for the learning rate decay
         self.define('lr_iters', [10, 20, 40, 60], 'list of iteration steps where the lr decay')
-        
 
         #Step 2: Define a flag that stores a list of reduction factors for the learning rate decay
         self.define('lr_rates', [1, 0.5, 0.5, 0.2], 'list of the lr rates')
-        
         ########## END CODE HERE ###########
 
     def define(self, argName, default, description):
         self[argName] = default
         self._descriptions[argName] = description
-    
+
     def help(self):
         print('Example usage: flow --imgdir sample_img/ --model cfg/yolo.cfg --load bin/yolo.weights')
         print('')

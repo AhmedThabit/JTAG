@@ -24,7 +24,7 @@ def _save_ckpt(self, step, loss_profile):
 
     profile = file.format(model, step, '.profile')
     profile = os.path.join(self.FLAGS.backup, profile)
-    with open(profile, 'wb') as profile_ckpt: 
+    with open(profile, 'wb') as profile_ckpt:
         pickle.dump(loss_profile, profile_ckpt)
 
     ckpt = file.format(model, step, '')
@@ -36,7 +36,7 @@ def _save_ckpt(self, step, loss_profile):
 
 def train(self):
     """
-    Executes the computational graph to progress in the optimization process. 
+    Executes the computational graph to progress in the optimization process.
 
     Calls the following functions:
        - .shuffle()
@@ -52,7 +52,8 @@ def train(self):
     scales = self.FLAGS.lr_rates
 
     #Step3: Store the argument of the flag --lr in a variable
-    lr = self.FLAGS.lr
+    init_lr = self.FLAGS.lr
+    lr = init_lr
 
     ######### END MODIFICATION HERE (Learning Rate Problem) ##########
 
@@ -74,7 +75,7 @@ def train(self):
         ))
 
         feed_dict = {
-            loss_ph[key]: datum[key] 
+            loss_ph[key]: datum[key]
                 for key in loss_ph }
         feed_dict[self.inp] = x_batch
         feed_dict.update(self.feed)
@@ -82,26 +83,22 @@ def train(self):
         ######### MODIFY CODE HERE (Learning Rate Problem) ##########
 
         #Step 1: Store the "lr" variable in the feed_dict
-        feed_dict["lr"] = lr
-        
+        feed_dict[self.learning_rate] = init_lr
+        feed_dict.update(self.feed)
 
-
-        #Step 2: Learning rate update condition 
-        if i in steps: 
+        #Step 2: Learning rate update condition
+        if i in steps:
             ids = steps.index(i)
 
-        
-   
-
             #Step 3: Rescale learning rate and print resulting learning rate
-            lr = scales[ids]*self.FLAGS.lr
+            lr = scales[ids]*lr
             print("#######################")
             print('Learning rate = %f'%lr)
 
          ######### END MODIFICATION HERE (Learning Rate Problem) ##########
 
 
-        fetches = [self.train_op, loss_op, self.summary_op] 
+        fetches = [self.train_op, loss_op, self.summary_op]
         fetched = self.sess.run(fetches, feed_dict)
         loss = fetched[1]
 
@@ -115,7 +112,7 @@ def train(self):
         self.say(form.format(step_now, loss, loss_mva))
         profile += [(loss, loss_mva)]
 
-        #Saves Training set Checkpoint 
+        #Saves Training set Checkpoint
         ckpt = (i+1) % (self.FLAGS.save // self.FLAGS.batch)
         args = [step_now, profile]
         if not ckpt: _save_ckpt(self, *args)
@@ -124,27 +121,27 @@ def train(self):
 
         # Get validation set data
 
-        (x_batch, datum) = next(val_batches)
-        feed_dict = {
-            loss_ph[key]: datum[key] 
-                for key in loss_ph }
-        feed_dict[self.inp] = x_batch
-        feed_dict.update(self.feed)
-        
-        feed_dict[self.learning_rate] = lr
+        #(x_batch, datum) = next(val_batches)
+        #feed_dict = {
+        #    loss_ph[key]: datum[key]
+        #        for key in loss_ph }
+        #feed_dict[self.inp] = x_batch
+        #feed_dict.update(self.feed)
 
-        fetches = [loss_op, self.summary_op] 
-        fetched = self.sess.run(fetches, feed_dict)
-        loss = fetched[0]
+        #feed_dict[self.learning_rate] = lr
 
-        if loss_mva_valid is None: loss_mva_valid = loss
-        loss_mva_valid = .9 * loss_mva_valid + .1 * loss
+        #fetches = [loss_op, self.summary_op]
+        #fetched = self.sess.run(fetches, feed_dict)
+        #loss = fetched[0]
 
-        self.val_writer.add_summary(fetched[1], step_now)
+        #if loss_mva_valid is None: loss_mva_valid = loss
+        #loss_mva_valid = .9 * loss_mva_valid + .1 * loss
 
-        #Print results
-        form = 'VALIDATION step {} - loss {} - moving ave loss {}'
-        self.say(form.format(step_now, loss, loss_mva_valid))
+        #self.val_writer.add_summary(fetched[1], step_now)
+
+        ##Print results
+        #form = 'VALIDATION step {} - loss {} - moving ave loss {}'
+        #self.say(form.format(step_now, loss, loss_mva_valid))
 
         ######### END MODIFICATION HERE (Validation Metric Problem) ##########
 
@@ -209,7 +206,7 @@ def predict(self):
         this_batch = new_all
 
         # Feed to the net
-        feed_dict = {self.inp : np.concatenate(inp_feed, 0)}    
+        feed_dict = {self.inp : np.concatenate(inp_feed, 0)}
         self.say('Forwarding {} inputs ...'.format(len(inp_feed)))
         start = time.time()
         out = self.sess.run(self.out, feed_dict)
