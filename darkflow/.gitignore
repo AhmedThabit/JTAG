@@ -4,6 +4,7 @@
 
 # C
 *.so
+*.pyx
 # Weight files
 bin/
 ./tmptrain/
