@@ -10,12 +10,52 @@ cd quick-start
 floyd init landinging/[PROJECT NAME]
 
 floyd run <insert-command-here>
-# To use GPU
+# To use GPU examples
 floyd run --gpu <insert-command-here>
 # To use a different environment
 floyd run --gpu --env pytorch <insert-command-here>
+# to mount data
+floyd run --data <data_set_name>:<mount_point> …(rest of run command)
 
 # example:
 floyd run --gpu --env tensorflow-1.3 "python train_and_eval.py"
+floyd run --data <data_set_name>:<mount_point> …(rest of run command)
+
+
+# create a folder deeplearning.ai/dataset_rolls
+# create a folder deeplearning.ai/weights
+floyd run \
+  --data ~/CloudStation/CS-scratchpad/data/deeplearning.ai:/dat \
+  "flow --backup /dat/ckpt/ \
+       --model cfg/tiny-yolo-voc-roll-jc.cfg \
+       --load /dat/weights/tiny-yolo-voc.weights \
+       --train \
+         --annotation /dat/dataset_rolls/tiny_train/annotations/ \
+         --dataset /dat/dataset_rolls/tiny_train/images/ \
+       --lr 0.0001 --epoch 200 --save 100 --batch 1"
+
+
+
+floyd run \
+  --data udacity/datasets/mnist/1:digits \
+  --data udacity/datasets/celeba/1:celeb \
+  "python script.py"
+
+
 
 floyd logs -t
+
+
+
+run.sh
+"
+python -m pip install -e .
+floyd run \
+  --data ~/CloudStation/CS-scratchpad/data/deeplearning.ai/:/root \
+  flow --model cfg/tiny-yolo-voc-roll-jc.cfg \
+       --load /root/weights/tiny-yolo-voc.weights \
+       --train \
+         --annotation /root/dataset_rolls/tiny_train/annotations/ \
+         --dataset /root/dataset_rolls/tiny_train/images/ \
+       --lr 0.0001 --epoch 200 --save 100 --batch 1"
+"
