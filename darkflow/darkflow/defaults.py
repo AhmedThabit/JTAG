@@ -41,8 +41,11 @@ class argHandler(dict):
         ########## START CODE HERE ###########
 
         #Step 1: Define a flag that stores a list of steps for the learning rate decay
+        self.define('lr_iters', [10, 20, 40, 60], 'list of iteration steps where the lr decay')
+        
 
         #Step 2: Define a flag that stores a list of reduction factors for the learning rate decay
+        self.define('lr_rates', [1, 0.5, 0.5, 0.2], 'list of the lr rates')
         
         ########## END CODE HERE ###########
 

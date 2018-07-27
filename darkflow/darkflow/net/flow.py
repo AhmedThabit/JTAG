@@ -46,10 +46,13 @@ def train(self):
     ######### MODIFY CODE HERE (Learning Rate Problem) ##########
 
     #Step1: Parse "steps" and store its values in a 1-D array
+    steps =self.FLAGS.lr_iters
 
     #Step2: Parse "scales" (reduction factors) and store its values in a 1-D array
+    scales = self.FLAGS.lr_rates
 
     #Step3: Store the argument of the flag --lr in a variable
+    lr = self.FLAGS.lr
 
     ######### END MODIFICATION HERE (Learning Rate Problem) ##########
 
@@ -79,12 +82,21 @@ def train(self):
         ######### MODIFY CODE HERE (Learning Rate Problem) ##########
 
         #Step 1: Store the "lr" variable in the feed_dict
+        feed_dict["lr"] = lr
+        
 
 
         #Step 2: Learning rate update condition 
+        if i in steps: 
+            ids = steps.index(i)
+
+        
    
 
-        #Step 3: Rescale learning rate and print resulting learning rate
+            #Step 3: Rescale learning rate and print resulting learning rate
+            lr = scales[ids]*self.FLAGS.lr
+            print("#######################")
+            print('Learning rate = %f'%lr)
 
          ######### END MODIFICATION HERE (Learning Rate Problem) ##########
 

@@ -18,8 +18,12 @@ def build_train_op(self):
     ############ MODIFY CODE HERE ##############
 
     #Step 1: Define a new placeholder for the learning rate
+    ourlr = tf.placeholder(tf.float32)
     
     #Step 2: Pass the new placeholder as an argument to the optimizer
+    # optimizer = tf.train.AdamOptimizer(learning_rate = ourlr) 
+    optimizer = self._TRAINER[self.FLAGS.trainer](ourlr)
+    gradients = optimizer.compute_gradients(self.framework.loss)
 
 
     ############ END MODIFICATION HERE ##############
