@@ -6,6 +6,7 @@
 *.so
 # Weight files
 bin/
+tmp/
 
 # Sample image data
 sample_img/*.jpg
